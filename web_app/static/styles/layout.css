@@ -10,7 +10,7 @@ body {
 }
 
 div {
-    padding: 5px;
+    padding: 5px 0 5px 0;
 }
 
 .header {
@@ -40,4 +40,22 @@ h1 {
     margin-top: 0;
     vertical-align: middle;
 
+}
+
+.contentbox {
+    float: left;
+    width: calc(50% - 10px);
+    margin: 0 5px 0 5px;
+    background-color: rosybrown;
+    display: block;
+}
+
+.content {
+    padding: 0;
+}
+
+.content:after {
+    content: "";
+    display: table;
+    clear: both;
 }
