@@ -7,6 +7,7 @@ import os
 load_dotenv()
 
 
+# use pydest to pull manifest
 async def main():
     destiny = pydest.Pydest(os.getenv('BUNGIE_API'))
 
