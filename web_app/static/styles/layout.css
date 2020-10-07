@@ -46,6 +46,7 @@ h1 {
     float: left;
     width: calc(50% - 10px);
     margin: 0 5px 0 5px;
+    padding: 5px;
     background-color: rosybrown;
     display: block;
 }
