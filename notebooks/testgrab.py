@@ -13,6 +13,7 @@ async def main():
 
     res = await destiny.api._get_request('https://www.bungie.net/Platform/Destiny2/Manifest/')
 
+    # print results
     print(res)
 
     await destiny.close()
