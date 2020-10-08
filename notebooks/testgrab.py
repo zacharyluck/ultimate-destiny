@@ -16,6 +16,7 @@ async def main():
     # print results
     print(res)
 
+    # make sure loop is closed
     await destiny.close()
 
 loop = asyncio.get_event_loop()
