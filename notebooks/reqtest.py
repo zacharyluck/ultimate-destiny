@@ -136,10 +136,8 @@ hashes = [
 # the tables list I'm actually using
 hashes_trunc = [
     'DestinyInventoryItemDefinition',
-    'DestinyTalentGridDefinition',
-    'DestinyStatDefinition',
-    'DestinySandboxPerkDefinition',
-    'DestinyStatGroupDefinition'
+    'DestinyInventoryBucketDefinition',
+    'DestinyItemTierTypeDefinition'
 ]
 
 # build dict from sql manifest and pickle it
