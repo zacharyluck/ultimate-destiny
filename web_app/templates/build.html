@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block selectioncontainer %}
+<form>
+    <input type="submit" value="Make me a build">
+</form>
+{% endblock %}
+
+{% block displaycontainer %}
+Kinetic:
+<img src="{{ kinetic_choice }}">
+
+Energy:
+<img src="{{ energy_choice }}">
+
+Power:
+<img src="{{ power_choice }}">
+
+Exotic Armor:
+<img src="{{ armor_choice }}">
+{% endblock %}
