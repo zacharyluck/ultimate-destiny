@@ -1,17 +1,9 @@
-{% extends "layout.html" %}
-
 {% extends "index.html" %}
 
 {% block displaycontainer %}
-Kinetic:
-<img src="{{ kinetic_choice }}">
-
-Energy:
-<img src="{{ energy_choice }}">
-
-Power:
-<img src="{{ power_choice }}">
-
-Exotic Armor:
-<img src="{{ armor_choice }}">
+Class: {{ c_class }} <br>
+Kinetic Weapon: {{ c_kin }} <br>
+Energy Weapon: {{ c_ener }} <br>
+Power Weapon: {{ c_pow }} <br>
+Exotic Armor: {{ c_arm }} <br>
 {% endblock %}

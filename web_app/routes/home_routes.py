@@ -10,8 +10,11 @@ def index():
     return render_template('index.html')
 
 
-@home_routes.route("/build")
-def show_build(c_class=None):
+@home_routes.route("/build", methods=['GET'])
+def show_build():
+    # get the data from the form on the main page
+    userinput = dict(request.args)
+
     # copied code from pickletest.py
     # load dict from pickle thru pandas into dataframe
     d = pd.read_pickle('manifest.pickle')
@@ -23,7 +26,7 @@ def show_build(c_class=None):
 
     # which class the player is using, will be inputted via HTML form
     # Titan: 0, Hunter: 1, Warlock: 2
-    class_choice = c_class
+    class_choice = int(userinput['class'])
 
     # start by grabbing inventory bucket defs for weapons
     # I'm doing this to ensure that, in the case of a manifest
@@ -134,6 +137,6 @@ def show_build(c_class=None):
         choices[2] = d_exotics[exotic_choice]['displayProperties']['name']
 
     return render_template(
-        'build.html', c_class=c_class, c_kin=choices[0],
+        'build.html', c_class=class_choice, c_kin=choices[0],
         c_ener=choices[1], c_pow=choices[2], c_arm=choices[3]
     )
