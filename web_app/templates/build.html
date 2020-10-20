@@ -1,9 +1,40 @@
 {% extends "index.html" %}
 
 {% block displaycontainer %}
-Class: {{ c_class }} <br>
-Kinetic Weapon: {{ c_kin }} <br>
-Energy Weapon: {{ c_ener }} <br>
-Power Weapon: {{ c_pow }} <br>
-Exotic Armor: {{ c_arm }} <br>
+Class: {{ c_class }} <br><br>
+Kinetic Weapon:<br>
+<div>
+    <img src="{{ c_kin_icon }}" style="
+        float: left; border: 2px solid black; display: block;
+        margin-right: 5px;">
+    <span>{{ c_kin }}</span>
+</div>
+<span style="content: ''; display: table; clear: both;"></span>
+<br><br>
+Energy Weapon:<br>
+<div>
+    <img src="{{ c_ener_icon }}" style="
+        float: left; border: 2px solid black; display: block;
+        margin-right: 5px;">
+    <span>{{ c_ener }}</span>
+</div>
+<span style="content: ''; display: table; clear: both;"></span>
+<br><br>
+Power Weapon:<br>
+<div>
+    <img src="{{ c_pow_icon }}" style="
+        float: left; border: 2px solid black; display: block;
+        margin-right: 5px;">
+    <span>{{ c_pow }}</span>
+</div>
+<span style="content: ''; display: table; clear: both;"></span>
+<br><br>
+Exotic Armor:<br>
+<div>
+    <img src="{{ c_arm_icon }}" style="
+        float: left; border: 2px solid black; display: block;
+        margin-right: 5px;">
+    <span>{{ c_arm }}</span>
+</div>
+<span style="content: ''; display: table; clear: both;"></span>
 {% endblock %}

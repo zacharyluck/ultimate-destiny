@@ -1,7 +1,14 @@
 from flask import Blueprint, jsonify, request, render_template
 import pandas as pd
 import random as rand
+import pydest
+from dotenv import load_dotenv
+import os
 
+# load environment variables
+load_dotenv()
+BUNGIE_API = os.getenv('BUNGIE_API')
+# set up route connections
 home_routes = Blueprint("home_routes", __name__)
 
 
@@ -27,6 +34,12 @@ def show_build():
     # which class the player is using, will be inputted via HTML form
     # Titan: 0, Hunter: 1, Warlock: 2
     class_choice = int(userinput['class'])
+    if class_choice == 0:
+        class_name = 'Titan'
+    if class_choice == 1:
+        class_name = 'Hunter'
+    if class_choice == 2:
+        class_name = 'Warlock'
 
     # start by grabbing inventory bucket defs for weapons
     # I'm doing this to ensure that, in the case of a manifest
@@ -120,23 +133,29 @@ def show_build():
         armor_choice = rand.sample(list(d_warlock), 1)[0]
         class_string = 'Warlock'
 
-    # print the results
-    choices = [
-        d_kinetic[kinetic_choice]["displayProperties"]["name"],
-        d_energy[energy_choice]["displayProperties"]["name"],
-        d_power[power_choice]["displayProperties"]["name"],
-        d_armors[armor_choice]["displayProperties"]["name"]
+    # grab the display props of the items chosen
+    items = [
+        d_kinetic[kinetic_choice]['displayProperties'],
+        d_energy[energy_choice]['displayProperties'],
+        d_power[power_choice]['displayProperties'],
+        d_armors[armor_choice]['displayProperties']
     ]
 
     # replace one slot with an exotic
     if d_exotics[exotic_choice]['inventory']['bucketTypeHash'] == BUCKET_KINETIC:
-        choices[0] = d_exotics[exotic_choice]['displayProperties']['name']
+        items[0] = d_exotics[exotic_choice]['displayProperties']
     if d_exotics[exotic_choice]['inventory']['bucketTypeHash'] == BUCKET_ENERGY:
-        choices[1] = d_exotics[exotic_choice]['displayProperties']['name']
+        items[1] = d_exotics[exotic_choice]['displayProperties']
     if d_exotics[exotic_choice]['inventory']['bucketTypeHash'] == BUCKET_POWER:
-        choices[2] = d_exotics[exotic_choice]['displayProperties']['name']
+        items[2] = d_exotics[exotic_choice]['displayProperties']
+
+    # seperate items into names and icon paths
+    names = [x['name'] for x in items]
+    icons = ['https://www.bungie.net'+x['icon'] for x in items]
 
     return render_template(
-        'build.html', c_class=class_choice, c_kin=choices[0],
-        c_ener=choices[1], c_pow=choices[2], c_arm=choices[3]
+        'build.html', c_class=class_name, c_kin=names[0],
+        c_ener=names[1], c_pow=names[2], c_arm=names[3],
+        c_kin_icon=icons[0], c_ener_icon=icons[1], c_pow_icon=icons[2],
+        c_arm_icon=icons[3]
     )
