@@ -6,6 +6,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+import re
 
 # start by unpickling the dicts
 d = pd.read_pickle('manifest.pickle')
@@ -91,6 +92,9 @@ for hash in d_items.keys():
         # get exotic perk description
         perkhash = d_items[hash]['sockets']['socketEntries'][3]['singleInitialItemHash']
         entry['ability'] = d_items[perkhash]['displayProperties']['description']
+        # fix up Aeon armor ability entries
+        entry['ability'] = re.sub('[\n].+', '', entry['ability'])
+        entry['ability'] = entry['ability'].replace('\n', '')
         # append to armor list
         d_armors[hash] = entry
 
@@ -199,6 +203,48 @@ while urllist:
         season += 1
         urllist = getpage(page, season)
         # from here, if the season is too high, the loop should stop
+
+# this is where I've manually constructed a lookup table
+# to pick exotics to make 'smart' builds
+#
+# I'm manually constucting them because there are too many
+# discrepancies in the descriptions of exotic perks to make a
+# programmatic solution to making this lookup table
+rules = []  # will be index enumerated similar to manifest
+titan_rules = {}
+titan_rules['generic'] = [  # can always be used to benefit
+    'Mask of the Quiet One',
+    'One-Eyed Mask',
+    'ACD/0 Feedback Fence',
+    'Synthoceps',
+    'Aeon Safe',
+    'Wormgod Caress',
+    "Citan's Ramparts",
+    'Crest of Alpha Lupi',
+    'Heart of Inmost Light',
+    'Severance Enclosure',
+    'Lion Rampant',
+    'Dunemarchers',
+    'Antaeus Wards',
+]
+titan_rules['solar'] = [  # needs any solar kills
+    "Khepri's Horn"
+]
+titan_rules['arc melee'] = [  # needs arc melee kills
+    'An Insurmountable Skullfort'
+]
+titan_rules['ward of dawn'] = [  # needs ward of dawn to use
+    'Helm of Saint-14'
+]
+titan_rules['fists of havoc'] = [  # needs fists of havoc to use
+    'Eternal Warrior'
+]
+titan_rules['sun warrior'] = [  # needs sun warrior to use
+    'Phoenix Cradle'
+]
+titan_rules['not magnitude'] = [  # has no effect if using top tree arc
+    'Armamentarium'
+]
 
 # all weapons should have a season stat now
 df_weapons = pd.DataFrame(d_weapons).T
