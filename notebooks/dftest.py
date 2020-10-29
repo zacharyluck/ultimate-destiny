@@ -7,6 +7,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import re
+import pickle
 
 # start by unpickling the dicts
 d = pd.read_pickle('manifest.pickle')
@@ -156,8 +157,6 @@ for hash in d_items.keys():
                         break
             tree.append(talent_nodes[n]['steps'][0]
                         ['displayProperties']['name'])
-            tree.append(talent_nodes[n]['steps'][0]
-                        ['displayProperties']['description'])
             if n == 14 or n == 18 or n == 23:
                 # these indicate the ends of trees
                 treeTalents.append(tree)
@@ -204,47 +203,49 @@ while urllist:
         urllist = getpage(page, season)
         # from here, if the season is too high, the loop should stop
 
-# this is where I've manually constructed a lookup table
-# to pick exotics to make 'smart' builds
-#
-# I'm manually constucting them because there are too many
-# discrepancies in the descriptions of exotic perks to make a
-# programmatic solution to making this lookup table
-rules = []  # will be index enumerated similar to manifest
-titan_rules = {}
-titan_rules['generic'] = [  # can always be used to benefit
-    'Mask of the Quiet One',
-    'One-Eyed Mask',
-    'ACD/0 Feedback Fence',
-    'Synthoceps',
-    'Aeon Safe',
-    'Wormgod Caress',
-    "Citan's Ramparts",
-    'Crest of Alpha Lupi',
-    'Heart of Inmost Light',
-    'Severance Enclosure',
-    'Lion Rampant',
-    'Dunemarchers',
-    'Antaeus Wards',
+# manually created dictionary to catch keywords in armor
+# effect descriptions, general-purpose armor should come back
+# with no matching keywords
+wordlist = [
+    # catch generic subclass exotics
+    'arc abilities', 'void abilities', 'solar abilities',
+    'arc melee', 'void melee', 'solar melee', 'blink',
+    'arc grenade', 'void grenade', 'solar grenade',  # <- will catch sunbracers
+    'arc bolt grenade', 'skip grenade', 'flux grenade',  # grenade-specifics
+    'lightning grenade', 'flashbang grenade', 'pulse grenade',
+    'storm grenade', 'tripmine grenade', 'incindiary grenade',
+    'swarm grenade', 'fusion grenade', 'thermite grenade',
+    'firebolt grenade', 'voidwall grenade', 'vortex grenade',
+    'spike grenade', 'suppressor grenade', 'magnetic grenade',
+    'scatter grenade', 'axion bolt', 'invisibility',
+    'knives', 'smoke bomb', 'shield bash',  # melee-specifics
+    'seismic strike', 'hammer strike', 'knife',
+    'arc staff', 'whirlwind guard', 'golden gun',  # super-specifics
+    'blade barrage', 'deadfall', 'moebius quiver',
+    'spectral blades', 'sentinel shield', 'ward of dawn',
+    'fists of havoc', 'sun warrior', 'nova bomb',
+    'daybreak', 'well of radiance', 'stormtrance',
+    'chaos reach',
+    'auto rifle', 'submachine gun', 'sword', 'bow',  # weapon-specifics
+    'sidearm', 'hand cannon'
 ]
-titan_rules['solar'] = [  # needs any solar kills
-    "Khepri's Horn"
-]
-titan_rules['arc melee'] = [  # needs arc melee kills
-    'An Insurmountable Skullfort'
-]
-titan_rules['ward of dawn'] = [  # needs ward of dawn to use
-    'Helm of Saint-14'
-]
-titan_rules['fists of havoc'] = [  # needs fists of havoc to use
-    'Eternal Warrior'
-]
-titan_rules['sun warrior'] = [  # needs sun warrior to use
-    'Phoenix Cradle'
-]
-titan_rules['not magnitude'] = [  # has no effect if using top tree arc
-    'Armamentarium'
-]
+exclusions = {  # replace supers so that certain keywords aren't found
+    'chaos reach': ['stormtrance'],
+    'thundercrash': ['fists of havoc'],
+    'blade barrage': ['golden gun'],
+    'spectral blades': ['deadfall', 'moebius quiver'],
+    'nova warp': ['nova bomb'],
+    'well of radiance': ['dawnblade']
+}
+inclusions = {  # add additional keywords to add catches
+    'warlock void subclass': 'blink',
+    'hunter void subclass': 'invisibility',
+    'knife': 'knives',
+    'snare bomb': 'smoke bomb',
+    'corrosive smoke': 'smoke bomb',
+    'vanish in smoke': 'smoke bomb',
+    'magnitude': 'not_armamentarium'
+}
 
 # all weapons should have a season stat now
 df_weapons = pd.DataFrame(d_weapons).T
@@ -254,3 +255,13 @@ df_subclasses = pd.DataFrame(d_subclasses).T
 df_weapons.to_csv('weapons.csv')
 df_armors.to_csv('armors.csv')
 df_subclasses.to_csv('subclasses.csv')
+
+with open('wordlist.pickle', 'wb') as f:
+    pickle.dump(wordlist, f)
+    print("'wordlist.pickle' created.")
+with open('exclusions.pickle', 'wb') as f:
+    pickle.dump(exclusions, f)
+    print("'exclusions.pickle' created.")
+with open('inclusions.pickle', 'wb') as f:
+    pickle.dump(inclusions, f)
+    print("'inclusions.pickle' created.")
