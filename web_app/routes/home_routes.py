@@ -25,6 +25,20 @@ inclusions = pd.read_pickle('inclusions.pickle')
 df_subclasses['treeNames'] = df['treeNames'].apply(lambda x: literal_eval(x))
 df_subclasses['treeTalents'] = df['treeTalents'].apply(
     lambda x: literal_eval(x))
+df_subclasses['grenadeNames'] = df['grenadeNames'].apply(
+    lambda x: literal_eval(x))
+
+# pre-create class and subclass maps for keywords
+classmap = {
+    0: 'titan',
+    1: 'hunter',
+    2: 'warlock'
+}
+subclassmap = {
+    2: 'arc',
+    3: 'solar',
+    4: 'void'
+}
 
 
 def newbuild(class_):
@@ -40,18 +54,35 @@ def newbuild(class_):
     # start by picking subclass
     # 2 = arc, 3 = solar, 4 = void
     element = rand.randint(2, 4)
-    # get specific subclass
+    # get subclass
     subclass = df_subclasses[
         (df_subclasses['element'] == element &
          df_subclasses['class'] == class_)
     ]
     d_subclass = subclass.to_dict(orient='records')
+    # get all subclass specific words
+    # start by generating generic keywords
+    keywords.append(classmap[class_] + ' ' +
+                    subclassmap[element] + ' subclass')
+    keywords += [
+        subclassmap[element] + ' damage',
+        subclassmap[element] + ' abilities',
+        subclassmap[element] + ' melee',
+        subclassmap[element] + ' grenade'
+    ]
+    # get grenades
+    keywords += d_subclass
     # pick subtree
     subtree = rand.randint(0, 2)
     for hash in d_subclass:
         keywords += d_subclass[hash]['superName']
         keywords += d_subclass[hash]['treeNames'][subtree]
         keywords += d_subclass[hash]['treeTalents'][subtree]
+
+    # pick weapons, lets start by setting up the output list
+    choices = []
+    # start by picking the exotic weapon
+    exotics = df_weapons[df_weapons['tierHash'] == 'Exotic']
 
 
 @home_routes.route("/")

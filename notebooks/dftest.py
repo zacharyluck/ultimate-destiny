@@ -64,7 +64,7 @@ for hash in d_items.keys():
         # grab icon path
         entry['icon'] = d_items[hash]['displayProperties']['icon']
         # get rarity hash
-        entry['tierHash'] = d_items[hash]['inventory']['tierTypeHash']
+        entry['tierHash'] = d_items[hash]['inventory']['tierTypeName']
         # get weapon type
         entry['weaponType'] = d_items[hash]['itemTypeDisplayName']
         # get equipping slot hash
@@ -73,7 +73,9 @@ for hash in d_items.keys():
         entry['ammoType'] = d_items[hash]['equippingBlock']['ammoType']
         # get class requirement
         entry['class'] = d_items[hash]['classType']
-        # add it to the list, season number will be extracted later
+        # set up season numbers for weapons without power caps
+        entry['season'] = -1
+        # add it to the list
         d_weapons[hash] = entry
 
     if d_items[hash]['itemType'] == 2 and d_items[hash]['inventory']['tierTypeHash'] == TIER_EXOTIC and 'collectibleHash' in d_items[hash]:
@@ -120,14 +122,22 @@ for hash in d_items.keys():
         entry['superName'] = talent_nodes[10]['steps'][0]['displayProperties']['name']
         treeTalents = []
         treeNames = []
+        grenades = []
         # set up treeTalents such that it's a list 3 elements long
         # and each element is a list of names and descriptions of
         # talents in that specific tree
         #
         # I apologize, future self, this was the only way I could
         # think of doing it
-        for n in range(11, 24):
-            if n == 19:
+        for n in range(7, 24):
+            if n >= 7 and n <= 9:
+                # grenade nodes
+                grenades.append(
+                    talent_nodes[n]['steps'][0]['displayProperties']['name']
+                )
+                continue  # don't deal with all the other checks
+            if n == 10 or n == 19:
+                # skip 10 since it's the super, we already have that
                 # skip 19 since it's blank, idk why
                 continue
             if n == 11 or n == 15 or n == 20:
@@ -162,6 +172,7 @@ for hash in d_items.keys():
                 treeTalents.append(tree)
         entry['treeNames'] = treeNames
         entry['treeTalents'] = treeTalents
+        entry['grenadeNames'] = grenades
         # add to dict
         d_subclasses[hash] = entry
 
