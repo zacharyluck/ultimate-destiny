@@ -12,41 +12,34 @@ import pickle
 # start by unpickling the dicts
 d = pd.read_pickle('manifest.pickle')
 
-
 # set up some shortcuts because I'm not writing this
-d_buckets = d['DestinyInventoryBucketDefinition']
+d_equipslots = d['DestinyEquipmentSlotDefinition']
 d_items = d['DestinyInventoryItemDefinition']
-d_tiers = d['DestinyItemTierTypeDefinition']
 d_talents = d['DestinyTalentGridDefinition']
 d_lores = d['DestinyLoreDefinition']
+
+# Set up rarity names so I only have to change these here
+TIER_EXOTIC = 'Exotic'
+TIER_LEGENDARY = 'Legendary'
 
 # start by grabbing inventory bucket defs for weapons
 # I'm doing this to ensure that, in the case of a manifest
 # re-hash, that these hash values don't need to be manually
 # updated
-BUCKET_POWER = None
-BUCKET_ENERGY = None
-BUCKET_KINETIC = None
-for hash in d_buckets.keys():
-    if 'displayProperties' not in d_buckets[hash]:
+EQUIP_POWER = None
+EQUIP_ENERGY = None
+EQUIP_KINETIC = None
+for hash in d_equipslots.keys():
+    if 'displayProperties' not in d_equipslots[hash]:
         continue
-    if 'name' not in d_buckets[hash]['displayProperties']:
+    if 'name' not in d_equipslots[hash]['displayProperties']:
         continue
-    if d_buckets[hash]['displayProperties']['name'] == 'Power Weapons':
-        BUCKET_POWER = hash
-    if d_buckets[hash]['displayProperties']['name'] == 'Energy Weapons':
-        BUCKET_ENERGY = hash
-    if d_buckets[hash]['displayProperties']['name'] == 'Kinetic Weapons':
-        BUCKET_KINETIC = hash
-
-# grab rarity hash values also
-TIER_LEGENDARY = None
-TIER_EXOTIC = None
-for hash in d_tiers.keys():
-    if d_tiers[hash]['displayProperties']['name'] == 'Legendary':
-        TIER_LEGENDARY = hash
-    if d_tiers[hash]['displayProperties']['name'] == 'Exotic':
-        TIER_EXOTIC = hash
+    if d_equipslots[hash]['displayProperties']['name'] == 'Power Weapons':
+        EQUIP_POWER = hash
+    if d_equipslots[hash]['displayProperties']['name'] == 'Energy Weapons':
+        EQUIP_ENERGY = hash
+    if d_equipslots[hash]['displayProperties']['name'] == 'Kinetic Weapons':
+        EQUIP_KINETIC = hash
 
 # set up weapon and exotic armor dataframes
 d_weapons = {}
@@ -64,21 +57,23 @@ for hash in d_items.keys():
         # grab icon path
         entry['icon'] = d_items[hash]['displayProperties']['icon']
         # get rarity hash
-        entry['tierHash'] = d_items[hash]['inventory']['tierTypeName']
+        entry['tierName'] = d_items[hash]['inventory']['tierTypeName']
         # get weapon type
         entry['weaponType'] = d_items[hash]['itemTypeDisplayName']
         # get equipping slot hash
         entry['equipSlot'] = d_items[hash]['equippingBlock']['equipmentSlotTypeHash']
-        # get ammo type
+        # get ammo type enum
         entry['ammoType'] = d_items[hash]['equippingBlock']['ammoType']
-        # get class requirement
+        # get damage type enum
+        entry['damageType'] = d_items[hash]['defaultDamageType']
+        # get class enum
         entry['class'] = d_items[hash]['classType']
         # set up season numbers for weapons without power caps
         entry['season'] = -1
         # add it to the list
         d_weapons[hash] = entry
 
-    if d_items[hash]['itemType'] == 2 and d_items[hash]['inventory']['tierTypeHash'] == TIER_EXOTIC and 'collectibleHash' in d_items[hash]:
+    if d_items[hash]['itemType'] == 2 and d_items[hash]['inventory']['tierTypeName'] == TIER_EXOTIC and 'collectibleHash' in d_items[hash]:
         # requirements: itemType is 2 (enum for armor)
         # tierTypeHash (rarity) is exotic
         # collectibleHash can be found in the item
@@ -257,6 +252,11 @@ inclusions = {  # add additional keywords to add catches
     'vanish in smoke': 'smoke bomb',
     'magnitude': 'not_armamentarium'
 }
+equip_hashes = [
+    EQUIP_KINETIC,
+    EQUIP_ENERGY,
+    EQUIP_POWER
+]
 
 # all weapons should have a season stat now
 df_weapons = pd.DataFrame(d_weapons).T
@@ -276,3 +276,6 @@ with open('exclusions.pickle', 'wb') as f:
 with open('inclusions.pickle', 'wb') as f:
     pickle.dump(inclusions, f)
     print("'inclusions.pickle' created.")
+with open('equiphashes.pickle', 'wb') as f:
+    pickle.dump(equip_hashes, f)
+    print("'equiphashes.pickle' created.")

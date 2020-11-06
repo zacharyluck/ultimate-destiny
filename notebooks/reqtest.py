@@ -136,8 +136,7 @@ hashes = [
 # the tables list I'm actually using
 hashes_trunc = [
     'DestinyInventoryItemDefinition',
-    'DestinyInventoryBucketDefinition',
-    'DestinyItemTierTypeDefinition',
+    'DestinyEquipmentSlotDefinition',
     'DestinyTalentGridDefinition',
     'DestinyLoreDefinition'
 ]
